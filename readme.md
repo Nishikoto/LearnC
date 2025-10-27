@@ -1,4 +1,4 @@
-﻿<h5>Learn C - Nishikoto - 24/10/2025</h5>
+﻿<h5 align="center">Learn C - Nishikoto - 24/10/2025</br>Cette page est tiré de mon apprentissage du site OpenClassrooms.com.</h5>
 
 # Variables
 
@@ -262,9 +262,243 @@ __DATE__ // permet de récup la date de la compilation
 __TIME__ // permet de récup l'heure de la compilation
 ```
 
-On peut aussi définir une constante vide `#define maConstanteVide`. [EXPLICATION]
+On peut aussi définir une constante vide `#define maConstanteVide`.
 
 ## Macro
 
-On peut créer une macro comme ceci: `#define maMacro() printf("Coucou toi!");`
+On peut créer une macro comme ceci: `#define maMacro() printf("Coucou toi!");`, on peut évidement créer plusieurs ligne par macro en utilisant le caractère `\`, voici un exemple:
 
+```c
+#define maMacro() printf("Coucou toi!\n"); \
+                  printf("Comment ça va?\n"); \
+                  printf("Au revoir!\n");)
+
+void main()
+{
+	maMacro()
+	return 0;
+}
+```
+
+Attention, à ne pas confondre avec les slashs `/`!
+À noter, le point virgule n'est pas obligatoire à la fin de l'appel d'une macro.
+
+Une Macro peut aussi prendre des paramètres et faire à peu près les mêmes choses qu'une fonction.
+
+```c
+#define majeur(age) if (age >= 18) \
+                         printf("Vous êtes majeur!\n"); \
+                    else \
+                         printf("Vous êtes mineur!\n"); \
+					
+void main()
+{
+	majeur(20)
+	return 0;
+}
+````
+
+On peut ajouter des accolades aussi!
+
+# Conditions en préprocesseur
+
+On peut faire des conditions en préprocesseur en utilisant `#if`, `#elif` et `#endif`. Attention, si la condition est vraie alors elle sera écrite dans le fichier lors de la compilation autrement elle n'apparaîtra juste pas.
+
+Exemple:
+```c
+#if 1
+	printf("Cette ligne sera toujours affichée!\n");
+#elif 
+	printf("Cette ligne ne sera jamais affichée!\n");
+#endif
+```
+
+J'ai écrit plus haut que l'on pouvait définir des constantes de préprocesseur vide, on va maintenant voir à quoi elle peuvent nous servir. On va donc imaginer que l'on souhaite faire un programme multiplateformes.
+
+```c
+#define WINDOWS
+
+#ifdef WINDOWS
+	printf("Programme pour Windows!\n");
+#endif
+
+#ifdef LINUX
+	printf("Programme pour Linux!\n");
+#endif
+
+#ifdef MAC
+	printf("Programme pour Mac!\n");
+#endif
+```
+
+Mainteanant que l'on connait tout ça, on peut ajouter une petite sécurité pour éviter qu'un fichier `.h` soit inclu plusieurs fois.
+I faut donc faire comme ceci dans tout nos fichiers `.h`:
+
+```c
+#ifndef MON_HEADER_H
+#define MON_HEADER_H
+
+// code du header (.h)
+
+#endif
+```
+
+# Structures
+
+Une structure permet de regrouper plusieurs variables sous un même nom. Voici comment en construire une:
+
+```c
+struct Coordonnees
+{
+	int x;
+	int y;
+};
+```
+
+Attention une structure doit ABSOLUMENT se terminer par un point-virgule et être composer d'au moins deux variables.
+
+On peut aussi ajouter des tableaux dans nos structures.
+
+```c
+struct Personne
+{
+	char nom[50];
+	char prenom[50];
+	char adresse[300];
+	int age;
+	int etudiant; // Boolean
+};
+```
+
+Maintenant il faut savoir s'en servir, voici comment:
+
+```c
+#include "main.h"  
+
+void main(int argc, char* argv[]) // équivalent à main()  
+{  
+	struct Personne utilisateur[2] = {0};
+
+	strcpy(utilisateur[0].prenom, "Nishi");
+	strcpy(utilisateur[0].nom, "Koto");
+	utilisateur[0].age = 22;
+	strcpy(utilisateur[0].adresse, "123 Rue de la paix, Tokyo");
+	utilisateur[0].etudiant = 0;
+
+	strcpy(utilisateur[1].prenom, "Evian");
+	strcpy(utilisateur[1].nom, "Off");
+	utilisateur[1].age = 18;
+	strcpy(utilisateur[1].adresse, "123 Rue de la cathedrale, Sfax");
+	utilisateur[1].etudiant = 1;
+
+  return 0;  
+}
+```
+
+Comme vous pouvez le voir nous déclarons un tableau de structure `utilisateur` qui contient deux `Personne`. Mais cela devrais être redondant à force de réecrire `struct MaStructure;` à chaque structure, c'est pour cela qu'il existe `typedef`; il nous permet simplement de créer un alias pour notre structure, voici comment l'écrire:
+
+`Dans notre fichier header (.h)`
+```c
+typedef struct Personne Personne;
+struct Personne
+{
+	char nom[50];
+	char prenom[50];
+	char adresse[300];
+	int age;
+	int etudiant; // Boolean
+};
+```
+
+Donc nous utilisons le type `typedef` pour définir un alias suivi de `struct Personne` pour définir un alias de la structure `Personne` et pour terminer le nom de notre alias.
+
+## Utilisation des pointeurs avec les structures
+
+Reprenons l'exemple de la structure Coordonnees et envoyons la dans une fonction via un pointeur.
+
+`main.h`
+```c
+#ifndef MAIN_H
+#define MAIN_H
+
+typedef struct Coordonnees Coordonnees;
+struct Coordonnees
+{
+	int x;
+	int y;
+};
+
+void initialiserCoordonnees(Coordonnees* point);
+
+#endif // MAIN_H
+```
+
+`main.c`
+```c
+#include "main.h"
+
+void main()
+{
+	Coordonnees monPoint;
+
+	initialiserCoordonnees(&monPoint);
+}
+
+void initialiserCoordonnees(Coordonnees* point)
+{
+	(*point).x = 10;
+	(*point).y = 20;
+}
+```
+
+Dans notre exemple, je crée une variable `monPoint` de type `Coordonnees`. Ensuite j'appelle la focntion `initialiserCoordonnees` contenant le paramère `point` qui attend un pointeur. Pour modifier le pointeur je met entre parenthèse `*point` pour que l'ordinateur comprenne que je veux prendre `*point` et non juste `point` et je peux donc modifier mes valeurs. (Compliqué... Oui... Un peu...)
+
+On peut aussi utiliser l'opérateur `->` pour simplifier l'écriture. Exemple:
+
+```c
+void initialiserCoordonnees(Coordonnees* point)
+{
+	point->x = 10;
+	point->y = 20;
+}
+```
+
+Mais il faut savoir que c'est STRICTEMENT équivalent à l'écriture avec les parenthèses!
+
+# Enum
+
+Une énumération permet de créer des constantes entières plus lisible. Voici comment en créer une:
+
+```c
+typedef enum Volume Volume;
+enum Volume
+{
+	FAIBLE,
+	MOYEN,
+	FORT
+};
+```
+
+On utilise aussi un `typedef` pour définir un alias pour notre énumération.
+
+Automatiquement une enum commence à 0 et incrémente de 1. Donc dans notre exemple `FAIBLE` vaut `0`, `MOYEN` vaut `1` et `FORT` vaut `2`. On peut aussi définir la valeur que l'on souhaite pour chaque élément.
+
+```c
+enum Volume
+{
+	FAIBLE = 10,
+	MOYEN = 50,
+	FORT
+};
+```
+
+Comme on peut le voir ici je n'ai rien ajouté à `FORT` et donc il prendra la valeur de `MOYEN + 1`, c'est à dire `51`.
+
+Grace à ça on pourra écrire de manière lisible dans notre code.
+
+```c
+if (musique == FORT)
+{
+	printf("La musique est trop forte!\n");
+}
+```

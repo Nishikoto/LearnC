@@ -31,5 +31,8 @@
     <ClInclude Include="nishi.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
