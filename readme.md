@@ -1,4 +1,4 @@
-﻿<h5 align="center">Learn C - Nishikoto - 24/10/2025</br>Cette page est tiré de mon apprentissage du site OpenClassrooms.com.</h5>
+﻿<h5 align="center">Learn C - Nishikoto</br>Créer le 24/10/2025 - Modifié le 28/10/2025</br>Cette page est tiré de mon apprentissage du site OpenClassrooms.com.</br>PS: Désoler pour les fautes d'orthographes!</h5>
 
 # Variables
 
@@ -502,3 +502,187 @@ if (musique == FORT)
 	printf("La musique est trop forte!\n");
 }
 ```
+
+# Manipulation de fichiers
+
+Pour appeler un fichier on utilise la structure `FILE` qui se trouve dans notre préprocesseur `stdio.h`.
+
+`FILE* fopen(const char* nomDuFichier, const char* modeOuverture); // Prototype de la fonction qui permet d'ouvrir un fichier`
+
+Attention à ne pas modifié la structure `FILE` directement car elle sera différente selon les systèmes d'exploitation. Par exemple nous ne ferons jamais `fichier.element`.
+
+Lorsque l'on créer une variable de type `FILE` on doit toujours le faire avec un pointeur et l'initialiser à `NULL`!
+
+Les modalitées d'ouverture sont les suivantes:
+
+- `r` : **Lecture seule**, permet de lire le fichier et le fichier doit exister.
+- `w` : **Ecriture seule**, permet seulement d'écrire dans le fichier, si le fichier n'éxiste pas il sera créé.
+- `a` : **Mode d'ajout**, permet d'ajouter du texte à la fin du fichier, si le fichier n'éxiste pas il sera créé.
+- `a+` : **Ajout en lecture/écriture à la fin**, permet de lire et d'ajouter du texte à la fin du fichier, si le fichier n'éxiste pas il sera créé.
+- `r+` : **Lecture/écriture**, permet de lire et d'écrire dans le fichier, le fichier doit exister.
+- `w+` : **Ecriture/lecture, avec suppression du contenu au préalable**, permet de d'abord vider le fichier puis d'écrire dedans et ensuite de le lire, si le fichier n'éxiste pas il sera créé.
+
+Le fichier doit toujours être dans le même répertoire que l'executable de notre programme. On peut toujours le mettre dans un sous-dossier. On peut aussi ouvrir n'importe quel fichier présent dans nos disques dur en faisant ça:
+
+`fichier = fopen("C:\\Program Files\\Notepad++\\readme.txt", "r+");`
+
+Dans mon exemple j'utilise des doubles antislashs `\\` car un simple antislash `\` est un caractère d'échappement en C.
+
+Le problème avec les chemins asolus (oui c'est comme ça qu'on dit) c'est que le programme ne saura pas trouver le fichier si il est exécuté sur un autre système d'exploitation, tel que Linux. C'est pour cela qu'il est préférable d'utiliser des chemins relatifs.
+
+Aprèsn avoir terminer de modifié notre fichier, il faut toujours le fermer avec la fonction `fclose`.
+
+```c
+// Prototype:
+int fclose(FILE* pointeurSurFicheir);
+```
+
+Voici un petit exemple complet:
+
+```c
+#include <stdio.h>
+
+void main()
+{
+	FILE *fichier = NULL;
+
+	fichier = fopen("monFichier.txt", "w+"); // fopen_s(&fichier, "test.txt", "+r");
+
+	if (fichier != NULL)
+	{
+		// Suite du code
+
+		fclose(fichier);
+	}
+	else
+	{
+		printf("Erreur lors de l'ouverture du fichier!\n");
+	}
+}
+```
+
+Il faut toujours penser à fermer son fichier après les modifications pour permettre de libérer de la mémoire. Si vous oubliez de libéré la mémoire sur de gros programmes vous vous heurterez surement à des fuites de mémoire. Attention donc à bien vérifier vos codes avant de les lancé.
+
+Nous allons voir maintenant comment écrire dans un fichier. Pour cela nous allons utiliser différentes fonctions:
+
+```c
+fputc // Pour écrire un seul caractère à la fois
+fputs // Pour écrire une chaîne de caractère
+fprintf // Pour écrire une chaîne formatées
+```
+
+## fputc
+
+```c
+// Prototype:
+
+int fputc(int caractere, FILE* pointeurSurFichier);
+```
+
+Ici `fputc` retourn un entier, si l'écriture s'est mal passée il retourne `EOF` (End Of File) sinon il retourne autre chose. Ensuite le premier paramètre est un `int` et le deuxième paramètre est le pointeur de notre fichier qui a comment type `FILE`.
+
+## fputs
+
+```c
+// Prototype:
+
+int fputs(const char* chaine, FILE* pointeurSurFichier);
+```
+
+Ici `fputs` retourne aussi un entier, si l'écriture s'est mal passée il retourne `EOF` (End Of File) sinon il retourne autre chose. Ensuite le premier paramètre est une chaîne (tableau quoi) de caractère et le deuxième paramètre est le pointeur de notre fichier qui a comment type `FILE`.
+
+## fprintf
+
+```c
+// Prototype:
+int fprintf(FILE* pointeurSurFichier, const char* format, ...);
+```
+
+Ici `fprintf` retourne toujours un entier, si l'écriture s'est mal passée il retourne `EOF` (End Of File) sinon il retourne autre chose. Ensuite le premier paramètre est le pointeur de notre fichier qui a comment type `FILE`, le deuxième paramètre est une chaîne de format et le reste des paramètres sont les variables à insérer dans la chaîne de format.
+
+## fgetc
+
+```c
+// Prototype:
+int fgetc(FILE* pointeurDeFichier);
+```
+
+Ici `fgetc` retourne un entier qui correspond au caractère lu, si la fonction n'a pas pu lire le caractère elle retourna `OEF`. Le paramètre est le pointeur de notre fichier qui a comme type `FILE`.
+A noté que le caractère retourné est la ou le curseur du fichier se trouve, imaginons que l'on souhaite lire `Bonjour!` alors on appel notre fonction `fgetc` qui nous retourneras `B` et si nous rappelons la même fonction alors cette fois-ci elle nous retournera `o`, vous me suivez?
+
+## fgets
+
+```c
+// Prototype:
+char* fgets(char* chaine, int nbreDeCaracteresALire, FILE* pointeurSurFichier);
+```
+
+Ici `fgets` retourne une chaîne de caractère (un pointeur vers un tableau de caractères) qui correspond à la chaîne lue, si la fonction n'a pas pu lire la chaîne elle retourna `NULL`. Le premier paramètre est un pointeur vers une chaîne de caractère (tableau de caractère) qui va recevoir la chaîne lue, le deuxième paramètre est le nombre de caractère à lire et le troisième paramètre est le pointeur de notre fichier qui a comme type `FILE`.
+
+Comme le prototype nous explique, nous avons besoin de définir la taille de notre tableau avant d'appeler la fonction `fgets` et pour cela nous pouvons faire appel à `define`.
+
+Il faut savoir que cette fonction ne peut lire qu'une seule ligne, si on souhaite en lire plusieurs il faudra faire une boucle.
+
+## fscanf
+
+```c
+// Prototype:
+void fscanf(FILE* pointeurSurFichier, char* chaine, ...);
+```
+
+Ici `fscanf` ne retourne rien, le premier paramètre est le pointeur de notre fichier qui a comme type `FILE`, le deuxième paramètre est une chaîne de format et le reste des paramètres sont les variables où seront stockées les valeurs lues.
+
+## Renommer un fichier
+
+```c
+int rename(const char* ancienNom, const char* nouveauNom); // Renomme un fichier
+```
+
+La fonction renvoie `0` si elle à réussie, autrement elle renvoie une valeur différente.
+
+## Supprimer un fichier
+
+```c
+int remove(const char* fichierASupprimer); // Supprime un fichier
+```
+
+Cette fonction supprime litéralement le fichier du disque dur. Elle ne le met pas dans la corbeille! Seul des outils spécifique pourrait récupérer le fichier! Elle ne demande pas de confirmation avant de supprimer le fichier.
+
+# Position du curseur dans un fichier
+
+Voici les 3 fonctions qui permettent de manipuler le curseur dans un fichier.
+
+## ftell
+
+```c
+long ftell(FILE* pointeurSurFichier); // Retourne la position actuelle du curseur dans le fichier
+```
+
+## fseek
+```c
+int fseek(FILE* pointeurSurFichier, long deplacement, int origine); // Permet de déplacer le curseur
+
+// Exemple:
+fseek(fichier, 2, SEEK_SET); // Déplace le curseur de 2 caractères depuis le début du fichier
+fseek(fichier, -2, SEEK_END); // Déplace le curseur de 2 caractères depuis la fin du fichier
+fseek(fichier, 3, SEEK_CUR); // Déplace le curseur de 3 caractères depuis la position actuelle
+```
+
+Remarquez que nous pouvons utiliser des valeurs négatives pour reculer le curseur et donc des valeurs positives pour avancer celui-ci. Comme écrit ci-dessus nous avons trois constantes préalablement défini, les voicis:
+
+```c
+SEEK_SET // Début du fichier
+SEEK_END // Fin du fichier
+SEEK_CUR // Position actuelle du curseur
+```
+
+Attention, si vous utilisez `fseek` pour déplacer le curseur dans un fichier ouvert en mode texte alors celle-ci peut se comporter bizarrement.
+
+## rewind
+
+```c
+void rewind(FILE* pointeurSurFichier); // Permet de ramener le curseur au début du fichier
+```
+
+Equivalent de la fonction `fseek` avec les paramètres `0` et `SEEK_SET`.
+
