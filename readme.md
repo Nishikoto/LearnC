@@ -617,7 +617,7 @@ A noté que le caractère retourné est la ou le curseur du fichier se trouve, i
 char* fgets(char* chaine, int nbreDeCaracteresALire, FILE* pointeurSurFichier);
 ```
 
-Ici `fgets` retourne une chaîne de caractère (un pointeur vers un tableau de caractères) qui correspond à la chaîne lue, si la fonction n'a pas pu lire la chaîne elle retourna `NULL`. Le premier paramètre est un pointeur vers une chaîne de caractère (tableau de caractère) qui va recevoir la chaîne lue, le deuxième paramètre est le nombre de caractère à lire et le troisième paramètre est le pointeur de notre fichier qui a comme type `FILE`.
+Ici `fgets` retourne une chaîne de caractère (un pointeur vers un tableau de caractères) qui correspond à la chaîne lue, si la fonction n'a pas pu lire la chaîne elle retourna `NULL`. Le premier paramètre est un pointeur vers une chaîne de caractère (tableau de caractère) qui va recevoir la chaîne lue, le deuxième paramètre est le nombre de caractère à lire et le troisième paramètre est le pointeur de notre fichier qui a comme type `FILE`, si nous souhaitons lire le clavier (ce qui est possible) nous devons mettre `stdin` comme dernier paramètre.
 
 Comme le prototype nous explique, nous avons besoin de définir la taille de notre tableau avant d'appeler la fonction `fgets` et pour cela nous pouvons faire appel à `define`.
 
@@ -686,3 +686,145 @@ void rewind(FILE* pointeurSurFichier); // Permet de ramener le curseur au début
 
 Equivalent de la fonction `fseek` avec les paramètres `0` et `SEEK_SET`.
 
+# La fonction basique sizeof
+
+Cette fonction directement intégré dans le language C permet de connaître la taille en octet d'un type ou d'une variable.
+
+```c
+// Exemple:
+
+printf("Resultat: %d", sizeof(int)); // Retourne 4 sur la plupart des systèmes
+```
+
+On peut faire ça aussi sur les structures, exemple:
+
+```c
+typedef Cordonnees Coordonnees;
+struct Coordonnees
+{
+	int x;
+	int y;
+};
+
+printf("Resultat: %d octes", sizeof(Coordonnees)); // Imaginon qu'elle retourn 8 octets
+```
+
+Et maintenant avec un tableau qui a comme type ma structure:
+
+```c
+Coordonnees monTableau[100]; // Elle retournera donc 8 multiplié par le nombre de case réservé dans notre tableau donc 800 octets!
+```
+
+# Allocation dynamique
+
+L'allocation dynamique permet de réserver de la mémoire à l'exécution du programme.
+
+## malloc
+
+La fonction `malloc` est utilisé pour réserver un certain nombre d'octets en mémoire.*
+
+```c
+// Prototype:
+void* malloc(size_t nombreOctetsNecessaires);
+```
+
+Le paramètre est le nombre d'octets que l'on souhaite réserver dans la mémoire. La fonction retourne un pointeur de type `void` car notre fonction ne sais pas quel type elle doit retourner, elle renvoie donc un type que l'on appel `type universel`, ce qui nous permettra de déclarer nous même le type souhaité.
+
+```c
+// Exemple:
+
+int *memoireAllouee = NULL;
+memoireAlloue = malloc(sizeof(int));
+```
+
+Comme pour la gestion de fichier nous devons tester notre allocation mémoire, en gros vérifié que notre mémoire à bien été alloué. Pour cela rien de plus simple on va faire comme pour les fichiers!
+
+```c
+int main()
+{
+	int *memoireAllouee = NULL;
+	memoireAllouee = malloc(sizeof(int));
+
+	if (memoireAllouee == NULL)
+	{
+		exit(0);
+	}
+	
+	// On peut continuer le programme normalement si la mémoire à bien été allouée
+
+	return 0;
+}
+```
+
+Dans mon exemple si la mémoire n'a pas pu être allouée alors le programme s'arrête immédiatement grace à la fonction `exit()`.
+
+## free
+
+La fonction `free` permet de libérer la mémoire que l'on a précédemment alloué avec `malloc`.
+
+```c
+// Prototype:
+void free(void* pointeurSurMemoireAllouee);
+```
+
+La fonction `free` à juste besoin de l'adresse de la mémoire à libérer et ne retourne rien.
+
+```c
+// Exemple:
+
+int main()
+{
+	int *memoireAllouee = NULL;
+	memoireAlloue = malloc(sizeof(int));
+
+	if (memoireAllouee == NULL)
+	{
+		exit(0);
+	}
+	
+	// On peut continuer le programme normalement si la mémoire à bien été allouée
+	free(memoireAllouee); // On libère la mémoire avant de quitter le programme
+
+	return 0;
+}
+```
+
+## Exemple d'utilisation du stockage dymamique avec un tableau
+
+On va demander combien d'amis à l'utilisateur et leurs ages.
+
+```c
+void main()
+{
+	int nombreAmis = 0, i = O;
+	int *AgeAmis = NULL;
+
+	printf("Combien d'amis avez-vous?\n");
+	scanf("%d", &nombreAmis);
+
+	if (nombreAmis > 0)
+	{
+		ageAmis = malloc(sizeof(int) * nombreAmis);
+
+		if (ageAmis == NULL)
+		{
+			exit(0);
+		}
+
+		for (i = 0; i < nombreAmis; i++)
+		{
+			printf("Quel âge a votre ami numéro %d?\n", i + 1);
+			scanf("%d", &ageAmis[i]);
+		}
+
+		for (i = 0; i < nombreAmis; i++)
+		{
+			printf("Votre ami numéro %d a %d an(s).\n", i + 1, ageAmis[i]);
+		}
+	
+		free(ageAmis);
+	}
+
+	return 0;
+}
+```

@@ -37,19 +37,34 @@ for (int i = 0; i < 2; i++)
 	}
 }*/
 
-	FILE* fichier = NULL;
+	//FILE* fichier = NULL;
 
-	fopen_s(&fichier, "test.txt", "r+");
+	//fopen_s(&fichier, "test.txt", "r+");
 
-	if (fichier == NULL)
-	{
-		printf("Erreur lors de l'ouverture du fichier.\n");
-	}
-	else
-	{
-		printf("Le fichier fonctionne!");
-		fclose(fichier);
-	}
+	//if (fichier == NULL)
+	//{
+	//	printf("Erreur lors de l'ouverture du fichier.\n");
+	//}
+	//else
+	//{
+	//	printf("Le fichier fonctionne!");
+	//	fclose(fichier);
+	//}
+
+	//int* memoireAllouee = NULL;
+	//memoireAllouee = malloc(sizeof(int)); // Allocation de la mémoire
+
+	//if (memoireAllouee == NULL)
+	//{
+	//	exit(0);
+	//}
+
+	//// Utilisation de la mémoire
+	//printf("Quel age avez-vous ? ");
+	//scanf_s("%d", memoireAllouee);
+	//printf("Vous avez %d ans\n", *memoireAllouee);
+
+	//free(memoireAllouee); // Libération de mémoire
 
 	return 0;
 }
